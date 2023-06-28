@@ -1,0 +1,28 @@
+body {
+    margin-left: 10px;
+}
+
+.body {
+    margin: 20px;
+}
+
+.post-container {
+    border: 1px lightgrey solid;
+    border-radius: 2px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.unstyled-button {
+    border: none;
+    background: none;
+    margin: -3px;
+}
+
+.unstyled-button:focus {
+    outline-style: none;
+}
+
+i {
+    color: red;
+}

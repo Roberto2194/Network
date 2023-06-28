@@ -1,0 +1,72 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+ 
+    <h2>Profile</h2>
+
+    {{ username|json_script:"username" }}
+    {{ followers|json_script:"followers" }}
+    {{ should_show_follow_button|json_script:"shouldShowFollowButton" }}
+    {{ is_user_following|json_script:"isUserFollowing" }}
+
+    <div id="follow-view" class="post-container">
+        <h5>{{ username }}</h5>
+        <div>Following: {{ following }}</div>
+        <div id="followers-count">Followers: {{ followers }}</div> 
+    </div>
+
+    <div id="posts-view">
+        {% for post in all_posts %}
+            <div class="post-container">
+                <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
+                <div>{{ post.body }}</div>
+                <a href="#">Edit</a>
+                <div class="text-muted">{{ post.timestamp }}</div>
+                {% if post in liked_posts %}
+                    <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
+                        <i class="bi bi-heart-fill" style="color:red;"></i> {{ post.likes }}
+                    </button>
+                {% else %}
+                    <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
+                        <i class="bi bi-heart" style="color:red;"></i> {{ post.likes }}
+                    </button>
+                {% endif %}     
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/profile.js' %}" type="module"></script>
+    <script>
+
+        function likePost(postId) {
+
+            fetch('/like', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    postId: postId
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+
+                let isPostLiked = result["isPostLiked"];
+                const likeCount = result["likeCount"];
+                
+                const likeButton = document.getElementById(`like-button-${postId}`);
+                
+                if (isPostLiked) {
+                    likeButton.innerHTML = `<i class="bi bi-heart-fill" style="color:red;"></i> ${likeCount}`;
+                } else {
+                    likeButton.innerHTML = `<i class="bi bi-heart" style="color:red;"></i> ${likeCount}`; 
+                }
+
+            })
+            
+        }
+
+    </script>
+{% endblock %}

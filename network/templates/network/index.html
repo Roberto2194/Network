@@ -1,0 +1,75 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+    <h2>All Posts</h2>
+    
+    <div id="form-view" class="post-container">
+        <form id="new-post-form">
+
+            <div class="form-group">
+                <h5 for="new-post-body">New Post</h5>
+                <textarea class="form-control" id="new-post-body" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Post</button>    
+        </form>    
+    </div>
+
+    <div id="posts-view">
+        {% for post in all_posts %}
+            <div class="post-container">
+                <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
+                <div>{{ post.body }}</div>
+                {% if post in user_posts %}
+                    <a href="#">Edit</a>
+                {% endif %}
+                <div class="text-muted">{{ post.timestamp }}</div>
+                {% if post in liked_posts %}
+                    <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
+                        <i class="bi bi-heart-fill" style="color:red;"></i> {{ post.likes }}
+                    </button>
+                {% else %}
+                    <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
+                        <i class="bi bi-heart" style="color:red;"></i> {{ post.likes }}
+                    </button>
+                {% endif %}     
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/index.js' %}" type="module"></script>
+    <script>
+
+        function likePost(postId) {
+
+            fetch('/like', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    postId: postId
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+
+                let isPostLiked = result["isPostLiked"];
+                const likeCount = result["likeCount"];
+                
+                const likeButton = document.getElementById(`like-button-${postId}`);
+                
+                if (isPostLiked) {
+                    likeButton.innerHTML = `<i class="bi bi-heart-fill" style="color:red;"></i> ${likeCount}`;
+                } else {
+                    likeButton.innerHTML = `<i class="bi bi-heart" style="color:red;"></i> ${likeCount}`; 
+                }
+
+            })
+            
+        }
+
+    </script>
+{% endblock %}

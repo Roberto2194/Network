@@ -118,6 +118,7 @@ def profile(request, username):
     if request.method == "GET":
 
         all_posts = user.posts.order_by("-timestamp")
+        all_posts = [post.serialize() for post in all_posts]
 
         following = user.userFollowing.count()
         followers = user.followed_by.count()
@@ -131,7 +132,8 @@ def profile(request, username):
 
             # the posts liked by the user
             liked_posts = request.user.postLikes.order_by("-timestamp")
-      
+            liked_posts = [post.serialize() for post in liked_posts]
+
             # if the user making the request is not the same 
             # than the one of the profile, show the follow button.
             # This prevents users from following/unfollowing themselves
@@ -229,9 +231,8 @@ def edit(request):
     data = json.loads(request.body)
     postId = data["postId"]
     postBody = data["postBody"]
-    print(type(postBody))
+ 
+    # Update post body
+    Post.objects.filter(id=postId).update(body=postBody)
 
-    # TODO: - Updating post body
-    # 
-
-    return JsonResponse({"message": "Post edited successfully."}, status=201)
+    return JsonResponse({"postBody": "Post edited successfully."}, status=201)

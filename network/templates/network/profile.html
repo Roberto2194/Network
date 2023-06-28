@@ -20,8 +20,8 @@
         {% for post in all_posts %}
             <div id="post-view-{{post.id}}" class="post-container">
                 <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
-                <div>{{ post.body }}</div>
-                <button style="color:#227bff;" class="unstyled-button" onclick="editPost({{ post.id }})">Edit</button>
+                <div id="post-body-{{post.id}}">{{ post.body }}</div>
+                <button style="color:#227bff;" class="unstyled-button" onclick="editPost({{ post }})">Edit</button>
                 <div class="text-muted">{{ post.timestamp }}</div>
                 {% if post in liked_posts %}
                     <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
@@ -32,6 +32,15 @@
                         <i class="bi bi-heart"></i> {{ post.likes }}
                     </button>
                 {% endif %}
+            </div>
+            <!-- edit post section -->
+            <div id="post-edit-{{post.id}}" class="post-container" style="display: none;">
+                <form id="edit-post-form">
+                    <div class="form-group">
+                        <textarea id="edit-post-body" class="form-control">{{ post.body }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>    
+                </form>
             </div>
         {% endfor %}
     </div>
@@ -60,16 +69,30 @@
             })
         }
 
-        function editPost(postId, postBody) {
-            const postView = document.getElementById(`post-view-${postId}`);  
-            postView.innerHTML = `<div><textarea>body</textarea></div>`;
+        function editPost(post) {
+            document.getElementById(`post-edit-${post.id}`).style.display = "block";
+            document.getElementById(`post-view-${post.id}`).style.display = "none";
 
-            const submitButton = document.createElement('button');
-            submitButton.type = "submit";
-            submitButton.className = "btn btn-primary"; 
-            submitButton.innerHTML = "Submit";
-            postView.append(submitButton);
-        }
+            document.querySelector('#edit-post-form').addEventListener('submit', () => {
+                event.preventDefault();
+
+                const postBody = document.querySelector('#edit-post-body').value;
+
+                fetch('/edit', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        postId: post.id,
+                        postBody: postBody 
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    document.getElementById(`post-body-${post.id}`).innerHTML = postBody;
+                    document.getElementById(`post-edit-${post.id}`).style.display = "none";
+                    document.getElementById(`post-view-${post.id}`).style.display = "block";
+                });
+            });
+        } 
 
     </script>
 {% endblock %}

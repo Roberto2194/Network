@@ -16,7 +16,7 @@ body {
 .unstyled-button {
     border: none;
     background: none;
-    margin: -3px;
+    margin-left: -5px;
 }
 
 .unstyled-button:focus {

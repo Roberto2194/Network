@@ -13,5 +13,6 @@ urlpatterns = [
 
     # API Routes
     path("create", views.create, name="create"),
-    path("like", views.like, name="like")
+    path("like", views.like, name="like"),
+    path("edit", views.edit, name="edit")
 ]

@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {    
- 
+
     const username = JSON.parse(document.getElementById('username').textContent);
 
+    // grabbing the follow info from the backend
     const shouldShowFollowButton = JSON.parse(document.getElementById('shouldShowFollowButton').textContent);
     let isUserFollowing = JSON.parse(document.getElementById('isUserFollowing').textContent);
     

@@ -13,11 +13,11 @@
                 <div class="text-muted">{{ post.timestamp }}</div>
                 {% if post in liked_posts %}
                     <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
-                        <i class="bi bi-heart-fill" style="color:red;"></i> {{ post.likes }}
+                        <i class="bi bi-heart-fill"></i> {{ post.likes }}
                     </button>
                 {% else %}
                     <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
-                        <i class="bi bi-heart" style="color:red;"></i> {{ post.likes }}
+                        <i class="bi bi-heart"></i> {{ post.likes }}
                     </button>
                 {% endif %}     
             </div>
@@ -29,9 +29,7 @@
 {% block script %}
     <script src="{% static 'network/following.js' %}" type="module"></script>
     <script>
-
         function likePost(postId) {
-
             fetch('/like', {
                 method: 'PUT',
                 body: JSON.stringify({
@@ -40,21 +38,13 @@
             })
             .then(response => response.json())
             .then(result => {
-
                 let isPostLiked = result["isPostLiked"];
                 const likeCount = result["likeCount"];
                 
                 const likeButton = document.getElementById(`like-button-${postId}`);
-                
-                if (isPostLiked) {
-                    likeButton.innerHTML = `<i class="bi bi-heart-fill" style="color:red;"></i> ${likeCount}`;
-                } else {
-                    likeButton.innerHTML = `<i class="bi bi-heart" style="color:red;"></i> ${likeCount}`; 
-                }
-
+                likeButton.innerHTML = isPostLiked ? `<i class="bi bi-heart-fill"></i> ` : `<i class="bi bi-heart"></i> `;
+                likeButton.append(likeCount);
             })
-            
         }
-
     </script>
 {% endblock %}

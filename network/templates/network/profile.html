@@ -18,20 +18,20 @@
 
     <div id="posts-view">
         {% for post in all_posts %}
-            <div class="post-container">
+            <div id="post-view-{{post.id}}" class="post-container">
                 <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
                 <div>{{ post.body }}</div>
-                <a href="#">Edit</a>
+                <button style="color:#227bff;" class="unstyled-button" onclick="editPost({{ post.id }})">Edit</button>
                 <div class="text-muted">{{ post.timestamp }}</div>
                 {% if post in liked_posts %}
                     <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
-                        <i class="bi bi-heart-fill" style="color:red;"></i> {{ post.likes }}
+                        <i class="bi bi-heart-fill"></i> {{ post.likes }}
                     </button>
                 {% else %}
                     <button id="like-button-{{post.id}}" class="unstyled-button" onclick="likePost({{ post.id }})">
-                        <i class="bi bi-heart" style="color:red;"></i> {{ post.likes }}
+                        <i class="bi bi-heart"></i> {{ post.likes }}
                     </button>
-                {% endif %}     
+                {% endif %}
             </div>
         {% endfor %}
     </div>
@@ -43,7 +43,6 @@
     <script>
 
         function likePost(postId) {
-
             fetch('/like', {
                 method: 'PUT',
                 body: JSON.stringify({
@@ -52,20 +51,24 @@
             })
             .then(response => response.json())
             .then(result => {
-
                 let isPostLiked = result["isPostLiked"];
                 const likeCount = result["likeCount"];
                 
                 const likeButton = document.getElementById(`like-button-${postId}`);
-                
-                if (isPostLiked) {
-                    likeButton.innerHTML = `<i class="bi bi-heart-fill" style="color:red;"></i> ${likeCount}`;
-                } else {
-                    likeButton.innerHTML = `<i class="bi bi-heart" style="color:red;"></i> ${likeCount}`; 
-                }
-
+                likeButton.innerHTML = isPostLiked ? `<i class="bi bi-heart-fill"></i> ` : `<i class="bi bi-heart"></i> `;
+                likeButton.append(likeCount);
             })
-            
+        }
+
+        function editPost(postId, postBody) {
+            const postView = document.getElementById(`post-view-${postId}`);  
+            postView.innerHTML = `<div><textarea>body</textarea></div>`;
+
+            const submitButton = document.createElement('button');
+            submitButton.type = "submit";
+            submitButton.className = "btn btn-primary"; 
+            submitButton.innerHTML = "Submit";
+            postView.append(submitButton);
         }
 
     </script>

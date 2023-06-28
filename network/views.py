@@ -12,15 +12,18 @@ from .models import *
 
 def index(request):
     all_posts = Post.objects.order_by("-timestamp")
+    all_posts = [post.serialize() for post in all_posts]
 
     user_posts = None
     liked_posts = None
     if request.user.is_authenticated:
         # the posts that the user can edit
         user_posts = request.user.posts.all()
+        user_posts = [post.serialize() for post in user_posts]
 
         # the posts liked by the user
         liked_posts = request.user.postLikes.order_by("-timestamp")
+        liked_posts = [post.serialize() for post in liked_posts]
 
     return render(request, "network/index.html", {
         "all_posts": all_posts,
@@ -189,6 +192,7 @@ def create(request):
 
 
 @csrf_exempt
+@login_required
 def like(request):
 
     # Liking/Unliking must be via PUT
@@ -196,7 +200,6 @@ def like(request):
         return JsonResponse({"error": "PUT request required."}, status=400)
 
     data = json.loads(request.body)
-    
     postId = data["postId"]
 
     post = Post.objects.get(id=postId)
@@ -214,3 +217,21 @@ def like(request):
         "likeCount": likeCount,
     }, status=201)
  
+
+@csrf_exempt
+@login_required
+def edit(request):
+
+    # Editing post must be via PUT
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT request required."}, status=400)
+
+    data = json.loads(request.body)
+    postId = data["postId"]
+    postBody = data["postBody"]
+    print(type(postBody))
+
+    # TODO: - Updating post body
+    # 
+
+    return JsonResponse({"message": "Post edited successfully."}, status=201)

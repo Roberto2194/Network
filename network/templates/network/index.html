@@ -5,6 +5,7 @@
 
     <h2>All Posts</h2>
     
+    <!-- New Post -->
     <div id="form-view" class="post-container">
         <form id="new-post-form">
             <div class="form-group">
@@ -16,7 +17,9 @@
     </div>
 
     <div id="posts-view">
-        {% for post in all_posts %}
+        {% for post in page_posts %}
+
+            <!-- All Posts -->
             <div id="post-view-{{post.id}}" class="post-container">
                 <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
                 <div id="post-body-{{post.id}}">{{ post.body }}</div>
@@ -34,7 +37,8 @@
                     </button>
                 {% endif %}
             </div>
-            <!-- edit post section -->
+
+            <!-- Edit Post -->
             <div id="post-edit-{{post.id}}" class="post-container" style="display: none;">
                 <form id="edit-form-{{post.id}}">
                     <div class="form-group">
@@ -43,8 +47,25 @@
                     <button type="submit" class="btn btn-primary">Submit</button>    
                 </form>
             </div>
+
         {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    <nav aria-label="page-navigation">
+        <ul class="pagination">
+            {% if page_posts.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_posts.previous_page_number }}">Previous</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Previous</a></li> 
+            {% endif %}
+            {% if page_posts.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_posts.next_page_number }}">Next</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Next</a></li> 
+            {% endif %}
+        </ul>
+    </nav>
 
 {% endblock %}
 

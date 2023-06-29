@@ -6,12 +6,18 @@ from django.http import JsonResponse
 from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 from .models import *
 
 
 def index(request):
+    # selecting only 10 posts to display 
+    # at a time with pagination
     all_posts = Post.objects.order_by("-timestamp")
+    paginator = Paginator(all_posts, 10)
+    page_number = request.GET.get("page")
+    page_posts = paginator.get_page(page_number)
 
     user_posts = None
     liked_posts = None
@@ -23,7 +29,7 @@ def index(request):
         liked_posts = request.user.postLikes.order_by("-timestamp")
 
     return render(request, "network/index.html", {
-        "all_posts": all_posts,
+        "page_posts": page_posts,
         "liked_posts": liked_posts,
         "user_posts": user_posts
     })
@@ -97,13 +103,18 @@ def following(request):
         user_posts = user_follow.posts.all()
         all_posts = all_posts | user_posts
 
+    # selecting only 10 posts to display 
+    # at a time with pagination
     all_posts = all_posts.order_by("-timestamp")
+    paginator = Paginator(all_posts, 10)
+    page_number = request.GET.get("page")
+    page_posts = paginator.get_page(page_number)
 
     # the posts liked by the user
     liked_posts = request.user.postLikes.order_by("-timestamp")
 
     return render(request, "network/following.html", {
-        "all_posts": all_posts,
+        "page_posts": page_posts,
         "liked_posts": liked_posts
     })
 
@@ -114,7 +125,12 @@ def profile(request, username):
 
     if request.method == "GET":
 
+        # selecting only 10 posts to display 
+        # at a time with pagination
         all_posts = user.posts.order_by("-timestamp")
+        paginator = Paginator(all_posts, 10)
+        page_number = request.GET.get("page")
+        page_posts = paginator.get_page(page_number)
 
         following = user.userFollowing.count()
         followers = user.followed_by.count()
@@ -141,7 +157,7 @@ def profile(request, username):
 
         return render(request, "network/profile.html", {
             "username": username,
-            "all_posts": all_posts,
+            "page_posts": page_posts,
             "liked_posts": liked_posts,
             "following": following,
             "followers": followers,
@@ -160,10 +176,7 @@ def profile(request, username):
         else: user.followed_by.add(request.user)
 
         followers = user.followed_by.count() 
-        return JsonResponse({
-            "isUserFollowing": not isUserFollowing,
-            "followers": followers,
-        }, status=201)
+        return JsonResponse({"isUserFollowing": not isUserFollowing, "followers": followers}, status=201)
 
 
 @csrf_exempt
@@ -179,10 +192,7 @@ def create(request):
     body = data.get("body", "")
 
     # Create post
-    post = Post(
-        author=request.user,
-        body=body
-    )
+    post = Post(author=request.user, body=body)
     post.save()
 
     return JsonResponse({"message": "Post created successfully."}, status=201)
@@ -209,10 +219,7 @@ def like(request):
     
     likeCount = post.liked_by.count()
 
-    return JsonResponse({
-        "isPostLiked": not isPostLiked,
-        "likeCount": likeCount,
-    }, status=201)
+    return JsonResponse({"isPostLiked": not isPostLiked, "likeCount": likeCount}, status=201)
  
 
 @csrf_exempt

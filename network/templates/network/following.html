@@ -27,24 +27,5 @@
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/following.js' %}" type="module"></script>
-    <script>
-        function likePost(postId) {
-            fetch('/like', {
-                method: 'PUT',
-                body: JSON.stringify({
-                    postId: postId
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                let isPostLiked = result["isPostLiked"];
-                const likeCount = result["likeCount"];
-                
-                const likeButton = document.getElementById(`like-button-${postId}`);
-                likeButton.innerHTML = isPostLiked ? `<i class="bi bi-heart-fill"></i> ` : `<i class="bi bi-heart"></i> `;
-                likeButton.append(likeCount);
-            })
-        }
-    </script>
+    <script src="{% static 'network/utils.js' %}" type="text/javascript"></script>
 {% endblock %}

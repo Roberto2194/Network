@@ -21,7 +21,7 @@
                 <h5><a style="color:black;" href="{% url 'profile' username=post.author %}">{{ post.author }}</a></h5>
                 <div id="post-body-{{post.id}}">{{ post.body }}</div>
                 {% if post in user_posts %}
-                    <button style="color:#227bff;" class="unstyled-button" onclick="editPost({{ post }})">Edit</button>
+                    <button style="color:#227bff;" class="unstyled-button" onclick="editPost({{ post.id }})">Edit</button>
                 {% endif %}
                 <div class="text-muted">{{ post.timestamp }}</div>
                 {% if post in liked_posts %}
@@ -36,9 +36,9 @@
             </div>
             <!-- edit post section -->
             <div id="post-edit-{{post.id}}" class="post-container" style="display: none;">
-                <form id="edit-post-form">
+                <form id="edit-form-{{post.id}}">
                     <div class="form-group">
-                        <textarea id="edit-post-body" class="form-control">{{ post.body }}</textarea>
+                        <textarea id="edit-body-{{post.id}}" class="form-control">{{ post.body }}</textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>    
                 </form>
@@ -50,50 +50,5 @@
 
 {% block script %}
     <script src="{% static 'network/index.js' %}" type="module"></script>
-    <script>
-
-        function likePost(postId) {
-            fetch('/like', {
-                method: 'PUT',
-                body: JSON.stringify({
-                    postId: postId
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                let isPostLiked = result["isPostLiked"];
-                const likeCount = result["likeCount"];
-                
-                const likeButton = document.getElementById(`like-button-${postId}`);
-                likeButton.innerHTML = isPostLiked ? `<i class="bi bi-heart-fill"></i> ` : `<i class="bi bi-heart"></i> `;
-                likeButton.append(likeCount);
-            })
-        }
-
-        function editPost(post) {
-            document.getElementById(`post-edit-${post.id}`).style.display = "block";
-            document.getElementById(`post-view-${post.id}`).style.display = "none";
-
-            document.querySelector('#edit-post-form').addEventListener('submit', () => {
-                event.preventDefault();
-
-                const postBody = document.querySelector('#edit-post-body').value;
-
-                fetch('/edit', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        postId: post.id,
-                        postBody: postBody 
-                    })
-                })
-                .then(response => response.json())
-                .then(result => {
-                    document.getElementById(`post-body-${post.id}`).innerHTML = postBody;
-                    document.getElementById(`post-edit-${post.id}`).style.display = "none";
-                    document.getElementById(`post-view-${post.id}`).style.display = "block";
-                });
-            });
-        }
-
-    </script>
+    <script src="{% static 'network/utils.js' %}" type="text/javascript"></script>
 {% endblock %}

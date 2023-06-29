@@ -12,18 +12,15 @@ from .models import *
 
 def index(request):
     all_posts = Post.objects.order_by("-timestamp")
-    all_posts = [post.serialize() for post in all_posts]
 
     user_posts = None
     liked_posts = None
     if request.user.is_authenticated:
         # the posts that the user can edit
         user_posts = request.user.posts.all()
-        user_posts = [post.serialize() for post in user_posts]
 
         # the posts liked by the user
         liked_posts = request.user.postLikes.order_by("-timestamp")
-        liked_posts = [post.serialize() for post in liked_posts]
 
     return render(request, "network/index.html", {
         "all_posts": all_posts,
@@ -118,7 +115,6 @@ def profile(request, username):
     if request.method == "GET":
 
         all_posts = user.posts.order_by("-timestamp")
-        all_posts = [post.serialize() for post in all_posts]
 
         following = user.userFollowing.count()
         followers = user.followed_by.count()
@@ -132,7 +128,6 @@ def profile(request, username):
 
             # the posts liked by the user
             liked_posts = request.user.postLikes.order_by("-timestamp")
-            liked_posts = [post.serialize() for post in liked_posts]
 
             # if the user making the request is not the same 
             # than the one of the profile, show the follow button.
